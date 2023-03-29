@@ -1,92 +1,49 @@
 const express = require("express");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const cors = require("cors");
+const knex = require("knex");
+const register = require("./controllers/register");
+const signin = require("./controllers/signin");
+const profile = require("./controllers/profile");
+const image = require("./controllers/image");
 
 const app = express();
+
+const db = knex({
+  client: "pg",
+  connection: {
+    host: "127.0.0.1",
+    database: "image-recognition",
+  },
+});
+const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
-const database = {
-  users: [
-    {
-      id: "123",
-      name: "John",
-      email: "john@gmail.com",
-      password: "cookies",
-      entries: 0,
-      joined: new Date(),
-    },
-    {
-      id: "124",
-      name: "Sally",
-      email: "sally@gmail.com",
-      password: "bananas",
-      entries: 0,
-      joined: new Date(),
-    },
-  ],
-};
-
 app.get("/", (req, res) => {
-  res.send(database.users);
+  res.json("success");
 });
 
-app.post("/signin", (req, res) => {
-  const { email, password } = req.body;
-  if (
-    email === database.users[0].email &&
-    password === database.users[0].password
-  ) {
-    res.json(database.users[0]);
-  } else {
-    res.status(400).json("Error logging in");
-  }
-});
+app.post("/signin", signin.handleSignin(db, bcrypt));
 
 app.post("/register", (req, res) => {
-  const { name, email, password } = req.body;
-
-  database.users.push({
-    id: "125",
-    name: name,
-    email: email,
-    entries: 0,
-    joined: new Date(),
-  });
-  res.json(database.users[database.users.length - 1]);
+  register.handleRegister(req, res, db, bcrypt);
 });
 
 app.get("/profile/:id", (req, res) => {
-  const { id } = req.params;
-  let found = false;
-  database.users.forEach((user) => {
-    if (user.id === id) {
-      found = true;
-      return res.json(user);
-    }
-  });
-  if (!found) {
-    res.status(404).json("No Such User");
-  }
+  profile.handleProfileGet(req, res, db);
 });
 
 app.put("/image", (req, res) => {
-  const { id } = req.body;
-  let found = false;
-  database.users.forEach((user) => {
-    if (user.id === id) {
-      found = true;
-      user.entries++;
-      return res.json(user.entries);
-    }
-  });
-  if (!found) {
-    res.status(404).json("No Such User");
-  }
+  image.handleImage(req, res, db);
 });
 
-app.listen(3000, () => {
-  console.log("App is running on 300");
+app.post("/imageurl", (req, res) => {
+  image.handleClarifaiApiCall(req, res);
+});
+
+app.listen(PORT, () => {
+  console.log(`App is running on ${PORT}`);
 });
