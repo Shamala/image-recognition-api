@@ -16,7 +16,7 @@ const db = knex({
     database: "image-recognition",
   },
 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

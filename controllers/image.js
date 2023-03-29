@@ -1,7 +1,7 @@
-const PAT = "9c190be0d5734c2ab57c4963fee46c38";
-const USER_ID = "shamala_mallya";
-const APP_ID = "face-recognition";
-const MODEL_ID = "general-image-detection";
+const PAT = process.env.PAT;
+const USER_ID = process.env.USER_ID;
+const APP_ID = process.env.APP_ID;
+const MODEL_ID = process.env.MODEL_ID;
 
 const getClarifaiRequestOptions = (imageUrl) => {
   const raw = JSON.stringify({
