@@ -12,8 +12,8 @@ const app = express();
 const db = knex({
   client: "pg",
   connection: {
-    host: "127.0.0.1",
-    database: "image-recognition",
+    host: process.env.DATABASE_HOST,
+    database: "image_recognition",
   },
 });
 const PORT = process.env.PORT;
